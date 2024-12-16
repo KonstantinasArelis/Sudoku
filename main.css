@@ -1,0 +1,19 @@
+.sudokuBoard tr td{
+    width: 50px;
+    height: 50px;
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+.sudokuBoard{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.sudokuContainer {
+    width: 600px;
+}
+
+#sudokuSubTable {
+    padding: 5px;
+}
