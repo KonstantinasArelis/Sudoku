@@ -1,11 +1,12 @@
 const handleClick = () => {
     validateBoard();
 }
+
 $(document).ready( function() {
     $(document).on('input', '.sudokuInput', function(e) {
         let inputValue = $(this).val();
         let numericValue = inputValue.replace(/[^1-9]/g, '').slice(0, 1);
-        $(this).val(numericValue); 
+        $(this).val(numericValue);
     });
 });
 
@@ -189,9 +190,11 @@ const validateSubTable = (subtableValue) => {
             const incorrectValue = value;
             $(`[data-subtable="${subtableValue}"]`).each(function() {
                 if(incorrectValue === $(this).find('input').val()){
-                    $(this).find('*').css('background-color', 'rgb(255, 188, 111)');
+                    $(this).children().addClass('cellMistake');
+                    //$(this).find('*').css('background-color', 'rgb(255, 188, 111)');
                 } else {
-                    $(this).find('*').css('background-color', 'rgb(255, 229, 111)');
+                    $(this).children().addClass('cellWarning');
+                    //$(this).find('*').css('background-color', 'rgb(255, 229, 111)');
                 }
             })
             return false;
@@ -223,9 +226,9 @@ const validateRow = (rowValue, subtableValue) => {
             $(`[data-row="${rowValue}"]`).each(function() {
                 if(acceptableSubtableValues.includes(Number($(this).attr('data-subtable')))){
                     if(incorrectValue === $(this).find('input').val()){
-                        $(this).find('*').css('background-color', 'rgb(255, 188, 111)');
+                        $(this).children().addClass('cellMistake');
                     } else {
-                        $(this).find('*').css('background-color', 'rgb(255, 229, 111)');
+                        $(this).children().addClass('cellWarning');
                     }
                 }
             })
@@ -260,9 +263,9 @@ const validateCollumn = (collumnValue, subtableValue) => {
             $(`[data-collumn="${collumnValue}"]`).each(function() {
                 if(acceptableSubtableValues.includes(Number($(this).attr('data-subtable')))){
                     if(incorrectValue === $(this).find('input').val()){
-                        $(this).find('*').css('background-color', 'rgb(255, 188, 111)');
+                        $(this).children().addClass('cellMistake');
                     } else {
-                        $(this).find('*').css('background-color', 'rgb(255, 229, 111)');
+                        $(this).children().addClass('cellWarning');
                     }
                 }
             })
@@ -288,9 +291,7 @@ const validateBoard = () => {
                         const answer = boardSolution[boardToIndex(subtableValue, rowValue, collumnValue)];
                         var res = $(this).val();
                         if(res === ''){
-                            $(this).parent().css('background-color', 'rgb(255, 186, 186)');
-                            $(this).css('background-color', 'rgb(255, 186, 186)');
-
+                            //cellMissingVcollumnValue
                             isComplete = false;
                         }
 
