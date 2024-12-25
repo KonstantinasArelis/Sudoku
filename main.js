@@ -169,10 +169,13 @@ const validateSubTable = (subtableValue) => {
         const value = $(this).find('input').val();
 
         if(valuesInSubtable.has(value) === true){
-            
+            const incorrectValue = value;
             $(`[data-subtable="${subtableValue}"]`).each(function() {
-                
-                $(this).find('*').css('background-color', 'rgb(255, 229, 111)');
+                if(incorrectValue === $(this).find('input').val()){
+                    $(this).find('*').css('background-color', 'rgb(255, 188, 111)');
+                } else {
+                    $(this).find('*').css('background-color', 'rgb(255, 229, 111)');
+                }
             })
             return false;
         } else {
@@ -199,10 +202,14 @@ const validateRow = (rowValue, subtableValue) => {
         }
         const value = $(this).find('input').val();
         if(valuesInRow.has(value) === true){
-
+            const incorrectValue = value;
             $(`[data-row="${rowValue}"]`).each(function() {
                 if(acceptableSubtableValues.includes(Number($(this).attr('data-subtable')))){
-                    $(this).find('*').css('background-color', 'rgb(255, 229, 111)');
+                    if(incorrectValue === $(this).find('input').val()){
+                        $(this).find('*').css('background-color', 'rgb(255, 188, 111)');
+                    } else {
+                        $(this).find('*').css('background-color', 'rgb(255, 229, 111)');
+                    }
                 }
             })
             return false;
@@ -214,7 +221,7 @@ const validateRow = (rowValue, subtableValue) => {
 
 const validateCollumn = (collumnValue, subtableValue) => {
     const valuesInRow = new Set();
-    let acceptableCollumnValues;
+    let acceptableSubtableValues;
     console.log("check: " + subtableValue);
     if([0,1,2].includes(subtableValue)){
         acceptableSubtableValues = [subtableValue, subtableValue+3, subtableValue+6];
@@ -223,17 +230,23 @@ const validateCollumn = (collumnValue, subtableValue) => {
     } else if([6,7,8].includes(subtableValue)){
         acceptableSubtableValues = [subtableValue, subtableValue-3, subtableValue-6];
     }
-    console.log("check2: " + acceptableSubtableValues);
-    $(`[data-row="${collumnValue}"]`).each(function() {
+
+    console.log("testttt " + acceptableSubtableValues);
+    $(`[data-collumn="${collumnValue}"]`).each(function() {
         if(!(acceptableSubtableValues.includes(Number($(this).attr('data-subtable'))))){
             return;
         }
         const value = $(this).find('input').val();
         if(valuesInRow.has(value) === true){
-
+            const incorrectValue = value;
+            
             $(`[data-collumn="${collumnValue}"]`).each(function() {
                 if(acceptableSubtableValues.includes(Number($(this).attr('data-subtable')))){
-                    $(this).find('*').css('background-color', 'rgb(255, 229, 111)');
+                    if(incorrectValue === $(this).find('input').val()){
+                        $(this).find('*').css('background-color', 'rgb(255, 188, 111)');
+                    } else {
+                        $(this).find('*').css('background-color', 'rgb(255, 229, 111)');
+                    }
                 }
             })
             return false;
@@ -245,7 +258,7 @@ const validateCollumn = (collumnValue, subtableValue) => {
 
 const validateBoard = () => {
     let isValid = true;
-
+    let isComplete = true;
     $(document).ready(function() {
         $('.sudokuBoard table').each(function() {
             $(this).find('tr').each(function() {
@@ -257,16 +270,19 @@ const validateBoard = () => {
                     $(this).find('input').each(function() {
                         const answer = boardSolution[boardToIndex(subtableValue, rowValue, collumnValue)];
                         var res = $(this).val();
-                        if(res === '' || res !== answer)
-                        {
-                            
+                        if(res === ''){
                             $(this).parent().css('background-color', 'rgb(255, 186, 186)');
                             $(this).css('background-color', 'rgb(255, 186, 186)');
 
+                            isComplete = false;
+                        }
+
+                        if(isComplete === true && res !== answer){
                             isValid = false;
-                            validateSubTable(subtableValue);
+                            
                             validateRow(rowValue, subtableValue);
                             validateCollumn(collumnValue, subtableValue);
+                            validateSubTable(subtableValue);
                         }
                     });
                     if (!isValid) return false;
