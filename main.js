@@ -1,6 +1,15 @@
 const handleClick = () => {
     validateBoard();
 }
+$(document).ready( function() {
+    $(document).on('input', '.sudokuInput', function(e) {
+        let inputValue = $(this).val();
+        let numericValue = inputValue.replace(/[^1-9]/g, '').slice(0, 1);
+        $(this).val(numericValue); 
+    });
+});
+
+
 
 const fetchCorrectBoard = () => {
     //const url = "https://6550e0cc7d203ab6626e476a.mockapi.io/api/v1/SudokuSolutions/1?fbclid=IwAR1uZmkq26ItDU29_qR9VRA87BMH0vMyFLo5NdDOb-2EsGP8dH8aXC997Mw";
@@ -17,7 +26,7 @@ const fetchCorrectBoard = () => {
     }).then(data => {
         const board = data.solution;
         return board;
-})}
+})};
 
 
 const fetchBoard = () => {
@@ -37,7 +46,7 @@ const fetchBoard = () => {
     }).catch(error => {
         console.error('Error:' + error);
     })
-}
+};
 
 const populareBoard = (board) => {
     let rowIndex = 0;
@@ -61,12 +70,13 @@ const populareBoard = (board) => {
             }
             if(board[j+ i * 9] != 'x')
             {
-                    $(`td[data-subtable="${subTableIndex}"][data-row="${rowIndex}"][data-collumn="${cellIndex}"]`).text(board[j+ i * 9]);
+                var input = $(`<input class="sudokuInput" type="numeric" min="1" max="9" value=${board[j+ i * 9]} disabled>`);
+                $(`td[data-subtable="${subTableIndex}"][data-row="${rowIndex}"][data-collumn="${cellIndex}"]`).append(input);
             } else {
                 $(document).ready(function(){
-                    var input = $('<input class="sudokuInput" type="numeric" min="1" max="9">');
+                    var input = $(`<input class="sudokuInput" type="numeric" min="1" max="9" value="">`);
                     $(`td[data-subtable="${subTableIndex}"][data-row="${rowIndex}"][data-collumn="${cellIndex}"]`).append(input);
-                })
+                });
             }
 
             cellIndex++;
@@ -74,7 +84,7 @@ const populareBoard = (board) => {
         subTableIndex -= 3;
         rowIndex++;
     }
-}
+};
 
 const boardToIndex = (_subTableIndex, _rowIndex, _cellIndex) => {
     let rowIndex = 0;
@@ -104,7 +114,7 @@ const boardToIndex = (_subTableIndex, _rowIndex, _cellIndex) => {
             subTableIndex -= 3;
             rowIndex++;
         }
-}
+};
 
 const createBoard = () => {
     $(document).ready(function() {
@@ -130,8 +140,8 @@ const createBoard = () => {
             }
             table.append(subTable);
         }
-    })
-}
+    });
+};
 
 const fillBoard = () => {
     let rowIndex = 0;
@@ -153,14 +163,21 @@ const fillBoard = () => {
                 cellIndex = 0;
                 subTableIndex++;
             }
-            $(`td[data-subtable="${subTableIndex}"][data-row="${rowIndex}"][data-collumn="${cellIndex}"]`).html('<input class="sudokuInput" type="numeric" min="1" max="9" value="' + boardSolution[j+ i * 9] + '">');
+
+            let cellInput = $('.sudokuBoard').find(`td[data-subtable="${subTableIndex}"][data-row="${rowIndex}"][data-collumn="${cellIndex}"]`).find('input');
+            if ($(cellInput).val() != ''){
+
+            } else {
+                $(`td[data-subtable="${subTableIndex}"][data-row="${rowIndex}"][data-collumn="${cellIndex}"]`).html('<input class="sudokuInput" type="numeric" min="1" max="9" value="' + boardSolution[j+ i * 9] + '">');
+            }
+            
     
             cellIndex++;
         }
         subTableIndex -= 3;
         rowIndex++;
     }
-}
+};
 
 const validateSubTable = (subtableValue) => {
     const valuesInSubtable = new Set();
@@ -182,7 +199,7 @@ const validateSubTable = (subtableValue) => {
             valuesInSubtable.add(value);
         }
     })
-}
+};
 
 const validateRow = (rowValue, subtableValue) => {
     const valuesInRow = new Set();
@@ -217,7 +234,7 @@ const validateRow = (rowValue, subtableValue) => {
             valuesInRow.add(value);
         }
     })
-}
+};
 
 const validateCollumn = (collumnValue, subtableValue) => {
     const valuesInRow = new Set();
@@ -253,8 +270,8 @@ const validateCollumn = (collumnValue, subtableValue) => {
         } else {
             valuesInRow.add(value);
         }
-    })
-}
+    });
+};
 
 const validateBoard = () => {
     let isValid = true;
@@ -342,7 +359,7 @@ const getCurrentBoardString = () => {
 
     console.log("Current Board: " + boardString);
     return boardString;
-}
+};
 
 
 let boardSolution;
