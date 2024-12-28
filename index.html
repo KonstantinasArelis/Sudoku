@@ -6,10 +6,12 @@
 </head>
 <body>
     <h1>Sudoku</h1>
-    <div class="sudokuContainer">
-        <table class="sudokuBoard"></table>
+    <div class="sudokuBoardContainer">
+        <div class="sudokuSubtableContainer">
+            <table class="sudokuBoard"></table>
+        </div>
     </div>
-    <button onClick="handleClick()">Validate</button>
+    <button onClick="submitBoard()">Validate</button>
     <button onClick="fillBoard()">Fill Answers</button>
     <script src="main.js"></script>
 </body>

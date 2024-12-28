@@ -1,12 +1,15 @@
-const handleClick = () => {
-    validateBoard();
-}
-
 $(document).ready( function() {
     $(document).on('input', '.sudokuInput', function(e) {
         let inputValue = $(this).val();
         let numericValue = inputValue.replace(/[^1-9]/g, '').slice(0, 1);
         $(this).val(numericValue);
+        
+        //remove warning styles from table for new validation
+        $(".sudokuBoard *").removeClass("cellWarning");
+        $(".sudokuBoard *").removeClass("cellMistake");
+        $(".sudokuBoard *").removeClass("cellMissingValue");
+        
+        validateInput();
     });
 });
 
@@ -180,33 +183,39 @@ const fillBoard = () => {
     }
 };
 
-const validateSubTable = (subtableValue) => {
+const validateSubTable = (_subtableValue) => {
+    const subtableValue = Number(_subtableValue);
     const valuesInSubtable = new Set();
+    let subtableIsCorrect = true;
 
     $(`[data-subtable="${subtableValue}"]`).each(function() {
         const value = $(this).find('input').val();
 
-        if(valuesInSubtable.has(value) === true){
+        if(value != '' && valuesInSubtable.has(value) === true){
+            subtableIsCorrect = false;
             const incorrectValue = value;
             $(`[data-subtable="${subtableValue}"]`).each(function() {
                 if(incorrectValue === $(this).find('input').val()){
-                    $(this).children().addClass('cellMistake');
-                    //$(this).find('*').css('background-color', 'rgb(255, 188, 111)');
+                    applyMistakeCellStyle($(this));
                 } else {
-                    $(this).children().addClass('cellWarning');
-                    //$(this).find('*').css('background-color', 'rgb(255, 229, 111)');
+                    applyWarningCellStyle($(this));
                 }
             })
             return false;
         } else {
             valuesInSubtable.add(value);
         }
-    })
+    });
+    console.log("status of subtable: " + subtableIsCorrect);
+    return subtableIsCorrect;
 };
 
-const validateRow = (rowValue, subtableValue) => {
+const validateRow = (_rowValue, _subtableValue) => {
+    const rowValue = Number(_rowValue);
+    const subtableValue = Number(_subtableValue);
     const valuesInRow = new Set();
     let acceptableSubtableValues;
+    let rowIsCorrect = true;
 
     if([0,3,6].includes(subtableValue)){
         acceptableSubtableValues = [subtableValue, subtableValue+1, subtableValue+2];
@@ -215,20 +224,21 @@ const validateRow = (rowValue, subtableValue) => {
     } else if([2,5,8].includes(subtableValue)){
         acceptableSubtableValues = [subtableValue, subtableValue-1, subtableValue-1];
     }
-    
+
     $(`[data-row="${rowValue}"]`).each(function() {
         if(!(acceptableSubtableValues.includes(Number($(this).attr('data-subtable'))))){
             return;
         }
         const value = $(this).find('input').val();
-        if(valuesInRow.has(value) === true){
+        if(value != '' && valuesInRow.has(value) === true){
+            rowIsCorrect = false;
             const incorrectValue = value;
             $(`[data-row="${rowValue}"]`).each(function() {
                 if(acceptableSubtableValues.includes(Number($(this).attr('data-subtable')))){
                     if(incorrectValue === $(this).find('input').val()){
-                        $(this).children().addClass('cellMistake');
+                        applyMistakeCellStyle($(this));
                     } else {
-                        $(this).children().addClass('cellWarning');
+                        applyWarningCellStyle($(this));
                     }
                 }
             })
@@ -236,13 +246,16 @@ const validateRow = (rowValue, subtableValue) => {
         } else {
             valuesInRow.add(value);
         }
-    })
+    });
+    return rowIsCorrect;
 };
 
-const validateCollumn = (collumnValue, subtableValue) => {
+const validateCollumn = (_collumnValue, _subtableValue) => {
+    const collumnValue = Number(_collumnValue);
+    const subtableValue = Number(_subtableValue);
     const valuesInRow = new Set();
     let acceptableSubtableValues;
-    console.log("check: " + subtableValue);
+    let collumnIsCorrect = true;
     if([0,1,2].includes(subtableValue)){
         acceptableSubtableValues = [subtableValue, subtableValue+3, subtableValue+6];
     } else if([3,4,5].includes(subtableValue)){
@@ -251,21 +264,21 @@ const validateCollumn = (collumnValue, subtableValue) => {
         acceptableSubtableValues = [subtableValue, subtableValue-3, subtableValue-6];
     }
 
-    console.log("testttt " + acceptableSubtableValues);
+
     $(`[data-collumn="${collumnValue}"]`).each(function() {
         if(!(acceptableSubtableValues.includes(Number($(this).attr('data-subtable'))))){
             return;
         }
         const value = $(this).find('input').val();
-        if(valuesInRow.has(value) === true){
+        if(value != '' && valuesInRow.has(value) === true){
             const incorrectValue = value;
-            
+            collumnIsCorrect = false;
             $(`[data-collumn="${collumnValue}"]`).each(function() {
                 if(acceptableSubtableValues.includes(Number($(this).attr('data-subtable')))){
                     if(incorrectValue === $(this).find('input').val()){
-                        $(this).children().addClass('cellMistake');
+                        applyMistakeCellStyle($(this));
                     } else {
-                        $(this).children().addClass('cellWarning');
+                        applyWarningCellStyle($(this));
                     }
                 }
             })
@@ -274,50 +287,66 @@ const validateCollumn = (collumnValue, subtableValue) => {
             valuesInRow.add(value);
         }
     });
+    return collumnIsCorrect;
 };
 
-const validateBoard = () => {
-    let isValid = true;
+const validateInput = () => {
+    let tableIsCorrect = true;
+    for(let subtable=0;subtable<=8;subtable++){
+        if(validateSubTable(subtable)){
+            for(let row=0;row<=3;row++){
+                for(let collumn=0;collumn<=3;collumn++){
+                    if(!validateRow(row, subtable)){
+                        tableIsCorrect = false;
+                    }
+                    if(!validateCollumn(collumn, subtable)){
+                        tableIsCorrect = false;
+                    }
+                }
+            }
+        } else {
+            tableIsCorrect = false;
+        }
+    }
+    return tableIsCorrect;
+    //inputElement.css('background-color', 'rgb(204, 29, 181)');
+}
+
+const boardCompletionCheck = () => {
     let isComplete = true;
     $(document).ready(function() {
-        $('.sudokuBoard table').each(function() {
-            $(this).find('tr').each(function() {
-                $(this).find('td').each(function() {
-                    var subtableValue = $(this).data('subtable'); 
-                    var rowValue = $(this).data('row');
-                    var collumnValue = $(this).data('collumn');
-
-                    $(this).find('input').each(function() {
-                        const answer = boardSolution[boardToIndex(subtableValue, rowValue, collumnValue)];
-                        var res = $(this).val();
-                        if(res === ''){
-                            //cellMissingVcollumnValue
-                            isComplete = false;
-                        }
-
-                        if(isComplete === true && res !== answer){
-                            isValid = false;
-                            
-                            validateRow(rowValue, subtableValue);
-                            validateCollumn(collumnValue, subtableValue);
-                            validateSubTable(subtableValue);
-                        }
-                    });
-                    if (!isValid) return false;
-                });
-                if (!isValid) return false;
-            });
-            if (!isValid) return false;
+        var board = $('.sudokuBoard');
+        board.find('.sudokuInput').each(function() {
+            if($(this).val() === ''){
+                isComplete = false;
+                applyMissingValueStyle($(this));
+            }
         });
     });
+    return isComplete;
+}
 
-    const boardString = getCurrentBoardString();
-    console.log("comparing: " + boardString + " to " + boardSolution);
-    if(boardString === boardSolution)
-    {
-        console.log("correct");
-    } else {
-        console.log("incorrect");
+const applyMissingValueStyle = (element) => {
+    element.addClass('cellMissingValue');
+}
+
+const applyWarningCellStyle = (element) => {
+    element.addClass('cellWarning');
+}
+
+const applyMistakeCellStyle = (element) => {
+    element.addClass('cellMistake');
+}
+
+const submitBoard = () => {
+    if(!boardCompletionCheck()){
+        console.log("missing");
+    }
+    if(!validateInput()){
+        console.log("board doesnt pass logic check");
+    }
+    if(getCurrentBoardString() !== boardSolution){
+        console.log("board does not match the predefined solution");
     }
 }
 
@@ -344,14 +373,9 @@ const getCurrentBoardString = () => {
                 cellIndex = 0;
                 subTableIndex++;
             }
-            let value = $(`td[data-subtable="${subTableIndex}"][data-row="${rowIndex}"][data-collumn="${cellIndex}"]`).text();
-            if (value != '') {
-                boardString += value;
-            } else {
-                inputedValue = $(`td[data-subtable="${subTableIndex}"][data-row="${rowIndex}"][data-collumn="${cellIndex}"]`).find('input').val();
-                boardString += inputedValue;
-            }
-
+            inputedValue = $(`td[data-subtable="${subTableIndex}"][data-row="${rowIndex}"][data-collumn="${cellIndex}"]`).find('input').val();
+            boardString += inputedValue;
+            
             cellIndex++;
         }
         subTableIndex -= 3;
@@ -377,3 +401,5 @@ fetchBoard()
             boardSolution = solution;
         })
     })
+
+    // json-server --watch db.json
