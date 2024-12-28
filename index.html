@@ -5,14 +5,19 @@
     <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
 </head>
 <body>
-    <h1>Sudoku</h1>
-    <div class="sudokuBoardContainer">
-        <div class="sudokuSubtableContainer">
-            <table class="sudokuBoard"></table>
+    <div class="title">
+        <h1>Sudoku</h1>
+    </div>
+    
+    <div class="mainGameContainer">
+        <div class="sudokuControllsContainer">
+            <div class="sudokuWindow">
+                <table class="sudokuBoard"></table>
+            </div>
+            <button onClick="submitBoard()">Validate</button>
+            <button onClick="fillBoard()">Fill Answers</button>
         </div>
     </div>
-    <button onClick="submitBoard()">Validate</button>
-    <button onClick="fillBoard()">Fill Answers</button>
     <script src="main.js"></script>
 </body>
 </html>
