@@ -1,3 +1,15 @@
+const hardCodedBoard = {
+    "width": 9,
+    "height": 9,
+    "board": "53xx7xxxx6xx195xxxx98xxxx6x8xxx6xxx34xx8x3xx17xxx2xxx6x6xxxx28xxxx419xx5xxxx8xx79",
+    "id": "1" 
+}
+
+const hardCodedAnswer = {
+    "solution": "534678912672195348198342567859761423426853791713924856961537284287419635345286179",
+    "id": "1"
+}
+
 $(document).ready( function() {
     $(document).on('input', '.sudokuInput', function(e) {
         let inputValue = $(this).val();
@@ -30,7 +42,11 @@ const fetchCorrectBoard = () => {
     }).then(data => {
         const board = data.solution;
         return board;
-})};
+    }).catch(error => {
+        console.log(error);
+        return hardCodedAnswer.solution;
+    })
+};
 
 
 const fetchBoard = () => {
@@ -49,6 +65,9 @@ const fetchBoard = () => {
         return data.board;
     }).catch(error => {
         console.error('Error:' + error);
+        $('.warningContainer').show();
+        $('.warningBox').text("API not active, using pre-defined sudoku board");
+        return hardCodedBoard.board;
     })
 };
 
