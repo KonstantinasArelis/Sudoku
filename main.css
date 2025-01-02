@@ -124,6 +124,7 @@
     display: flex;
     flex-direction: column;
     -ms-flex-align: center;
+    border-radius: 15px;
 }
 
 #overlay {

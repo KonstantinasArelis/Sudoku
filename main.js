@@ -17,13 +17,17 @@ $(document).ready( function() {
         $(this).val(numericValue);
         
         //remove warning styles from table for new validation
-        $(".sudokuBoard *").removeClass("cellWarning");
-        $(".sudokuBoard *").removeClass("cellMistake");
-        $(".sudokuBoard *").removeClass("cellMissingValue");
+        removeBoardNotations();
         
         validateInput();
     });
 });
+
+const removeBoardNotations = () => {
+    $(".sudokuBoard *").removeClass("cellWarning");
+    $(".sudokuBoard *").removeClass("cellMistake");
+    $(".sudokuBoard *").removeClass("cellMissingValue");
+}
 
 const displayMessageBox = () => {
     $('#messageBox').show();
@@ -171,7 +175,7 @@ const createBoard = () => {
                 subTable.append(row);
             }
             table.append(subTable);
-        }
+        } 
     });
 };
 
@@ -196,12 +200,9 @@ const fillBoard = () => {
                 subTableIndex++;
             }
 
-            let cellInput = $('.sudokuBoard').find(`td[data-subtable="${subTableIndex}"][data-row="${rowIndex}"][data-collumn="${cellIndex}"]`).find('input');
-            if ($(cellInput).val() != ''){
 
-            } else {
                 $(`td[data-subtable="${subTableIndex}"][data-row="${rowIndex}"][data-collumn="${cellIndex}"]`).html('<input class="sudokuInput" type="numeric" min="1" max="9" value="' + boardSolution[j+ i * 9] + '">');
-            }
+            
             
     
             cellIndex++;
@@ -364,40 +365,64 @@ const applyWarningCellStyle = (element) => {
 const applyMistakeCellStyle = (element) => {
     element.addClass('cellMistake');
 }
-disableMessageBox();
+
 const submitBoard = () => {
+    let completedSuccefully = true;
+
     if(!boardCompletionCheck()){
+        completedSuccefully = false;
         displayMessageBox();
         let text = '<p class="simpleText"> You have to fill out all free cells in sudoku';
         
         $('#messageBoxContent').append(text);
     } else if(!validateInput()){
+        completedSuccefully = false;
         displayMessageBox();
         let text = '<p class="simpleText"> The board is incorrect';
         
         $('#messageBoxContent').append(text);
     } else if(getCurrentBoardString() !== boardSolution){
+        completedSuccefully = false;
         displayMessageBox();
         let text = '<p class="simpleText"> The board looks correct, but it does not match the pre-defined answer';
         
         $('#messageBoxContent').append(text);
     }
-
-    let oKbutton = '<button onClick="disableMessageBox()" class="simpleButton simpleText"> Ok';
-    $('#messageBoxContent').append(oKbutton);
-    let restartButton = '<button onClick="disableMessageBox(); restartSudoku()" class="simpleButton simpleText"> Restart';
-    $('#messageBoxContent').append(restartButton);
-    let revealAnswerButton = '<button onClick="revealAnswer()" class="simpleButton simpleText"> Show Answer';
-    $('#messageBoxContent').append(revealAnswerButton);
-    displayMessageBox();
+    if(completedSuccefully === false){
+        let oKbutton = '<button onClick="disableMessageBox()" class="simpleButton simpleText"> Ok';
+        $('#messageBoxContent').append(oKbutton);
+        let restartButton = '<button onClick="disableMessageBox(); restartSudoku()" class="simpleButton simpleText"> Restart';
+        $('#messageBoxContent').append(restartButton);
+        let revealAnswerButton = '<button onClick="disableMessageBox(); revealAnswer()" class="simpleButton simpleText"> Show Answer';
+        $('#messageBoxContent').append(revealAnswerButton);
+        displayMessageBox();
+    } else {
+        if(boardWasFilled === false){
+            let text = '<p class="simpleText"> You won! Good job!';
+        $('#messageBoxContent').append(text);
+        } else {
+            let text = '<p class="simpleText"> You auto-filled the board, better luck next time!';
+        $('#messageBoxContent').append(text);
+        }
+        let restartButton = '<button onClick="disableMessageBox(); restartSudoku()" class="simpleButton simpleText"> Restart';
+        $('#messageBoxContent').append(restartButton);
+        displayMessageBox();
+    }
 }
 
 const restartSudoku = () => {
-
+    // delete everything inside each of the cells
+    $("[data-subtable]").empty();
+    // re-populate the board
+    populareBoard(defaultBoard);
+    boardWasFilled = false;
+    removeBoardNotations();
 }
 
 const revealAnswer = () => {
-
+    removeBoardNotations();
+    fillBoard();
+    boardWasFilled = true;
 }
 
 
@@ -433,10 +458,13 @@ const getCurrentBoardString = () => {
 
 
 let boardSolution;
+let defaultBoard;
+let boardWasFilled = false;
 
 createBoard();
 fetchBoard()
     .then(board => {
+        defaultBoard = board;
         populareBoard(board);
     })
     .then(() => {
