@@ -102,3 +102,52 @@
     font-style: normal;
     font-family: Arial, sans-serif;
 }
+
+#messageBox {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0, 0, 0, 0.4); 
+}
+
+#messageBoxContent {
+    background-color: #fefefe;
+    margin: 15% auto; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 30%; 
+    display: flex;
+    flex-direction: column;
+    -ms-flex-align: center;
+}
+
+#overlay {
+    display: none;
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); 
+    z-index: 1; 
+}
+
+.simpleButton {
+    border-radius: 15px;
+    background-color: rgb(132, 181, 255);
+    padding: 3%;
+    margin: 1%;
+    width: 100%;
+    border: none;
+}
+
+.simpleText {
+    text-align: center;
+    font-style: normal;
+    font-family: Arial, sans-serif;
+}

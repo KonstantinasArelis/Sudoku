@@ -25,7 +25,16 @@ $(document).ready( function() {
     });
 });
 
+const displayMessageBox = () => {
+    $('#messageBox').show();
+    $('.overlay').show();
+}
 
+const disableMessageBox = () => {
+    $('#messageBox').hide();
+    $('.overlay').hide();
+    $('#messageBoxContent').empty();
+}
 
 const fetchCorrectBoard = () => {
     //const url = "https://6550e0cc7d203ab6626e476a.mockapi.io/api/v1/SudokuSolutions/1?fbclid=IwAR1uZmkq26ItDU29_qR9VRA87BMH0vMyFLo5NdDOb-2EsGP8dH8aXC997Mw";
@@ -225,7 +234,6 @@ const validateSubTable = (_subtableValue) => {
             valuesInSubtable.add(value);
         }
     });
-    console.log("status of subtable: " + subtableIsCorrect);
     return subtableIsCorrect;
 };
 
@@ -356,17 +364,36 @@ const applyWarningCellStyle = (element) => {
 const applyMistakeCellStyle = (element) => {
     element.addClass('cellMistake');
 }
-
+disableMessageBox();
 const submitBoard = () => {
     if(!boardCompletionCheck()){
-        console.log("missing");
+        displayMessageBox();
+        let text = '<p class="simpleText"> You have to fill out all free cells in sudoku';
+        
+        $('#messageBoxContent').append(text);
+    } else if(!validateInput()){
+        displayMessageBox();
+        let text = '<p class="simpleText"> The board is incorrect';
+        
+        $('#messageBoxContent').append(text);
+    } else if(getCurrentBoardString() !== boardSolution){
+        displayMessageBox();
+        let text = '<p class="simpleText"> The board looks correct, but it does not match the pre-defined answer';
+        
+        $('#messageBoxContent').append(text);
     }
-    if(!validateInput()){
-        console.log("board doesnt pass logic check");
-    }
-    if(getCurrentBoardString() !== boardSolution){
-        console.log("board does not match the predefined solution");
-    }
+
+    let oKbutton = '<button onClick="disableMessageBox()" class="simpleButton simpleText"> Ok';
+    $('#messageBoxContent').append(oKbutton);
+    let restartButton = '<button onClick="disableMessageBox(); restartSudoku()" class="simpleButton simpleText"> Restart';
+    $('#messageBoxContent').append(restartButton);
+    let revealAnswerButton = '<button onClick="revealAnswer()" class="simpleButton simpleText"> Show Answer';
+    $('#messageBoxContent').append(revealAnswerButton);
+    displayMessageBox();
+}
+
+const restartSudoku = () => {
+
 }
 
 const revealAnswer = () => {
@@ -401,7 +428,6 @@ const getCurrentBoardString = () => {
         rowIndex++;
     }
 
-    console.log("Current Board: " + boardString);
     return boardString;
 };
 
@@ -411,7 +437,6 @@ let boardSolution;
 createBoard();
 fetchBoard()
     .then(board => {
-        console.log("Populating board with: " + board);
         populareBoard(board);
     })
     .then(() => {
