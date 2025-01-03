@@ -165,7 +165,7 @@
     justify-content: space-between;
 }
 
-.headerInfo p,a{
+.headerInfo p,a {
     margin: 10px;
     text-align: center;
     font-style: normal;
@@ -176,4 +176,34 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box; 
-  }
+}
+
+@keyframes helicopterPass {
+    0% {
+        transform: translateX(0) translateY(0) rotate(0deg);
+    }
+    100% {
+        transform: translateX(-400%) translateY(45%) rotate(30deg);
+    }
+}
+
+@keyframes explosion {
+
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}   
+
+#helicopter {
+    position: fixed;
+    left: 100%;
+    animation: helicopterPass 2s linear 1;
+    height: 70%;
+    width: 70%;
+}

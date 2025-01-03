@@ -264,8 +264,14 @@ const validateRow = (_rowValue, _subtableValue) => {
             $(`[data-row="${rowValue}"]`).each(function() {
                 if(acceptableSubtableValues.includes(Number($(this).attr('data-subtable')))){
                     if(incorrectValue === $(this).find('input').val()){
+                        doHelicopterPass();
+                        applyBulletHole($(this));
+                        applyExplosion($(this));
                         applyMistakeCellStyle($(this));
                     } else {
+                        doHelicopterPass();
+                        applyBulletHole($(this));
+                        applyExplosion($(this));
                         applyWarningCellStyle($(this));
                     }
                 }
@@ -277,6 +283,74 @@ const validateRow = (_rowValue, _subtableValue) => {
     });
     return rowIsCorrect;
 };
+
+const applyBulletHole = (element) => {
+    const duration = (Math.random()+1) * 2;
+    const position = $(element).offset();
+    const offsetX = Math.random() * $(element).width() + position.left;
+    const offsetY = Math.random() * $(element).height() + position.top;
+
+    let styling = `
+        position: absolute;
+        left: ${offsetX}px;
+        top: ${offsetY}px;
+        width: 20px;
+        height: 20px;
+        animation: fadeOut ${duration}s linear 1;
+    `;
+    let bulletHole = `<img src = "./bulletImpact.png" style="${styling}" class="bulletHole">`
+    let bulletHoleInstance = $(bulletHole).appendTo('body');
+    setTimeout(() => {
+        $(bulletHoleInstance).remove();
+    }, duration * 950);
+}
+
+const applyExplosion = (element) => {
+    const delay = Math.random() * 500;
+
+
+    setTimeout(() => {
+        const position = $(element).offset();
+        const offsetX = (Math.random() - 0.5) * $(element).width()  + position.left;
+        const offsetY = (Math.random() - 0.5) * $(element).height() + position.top;
+
+        let styling = `
+            position: absolute;
+            left: ${offsetX}px;
+            top: ${offsetY}px;
+            width: 100px;
+            height: 100px;
+        `;
+        let bulletHole = `<img src = "./explosion.gif" style="${styling}">`
+        let bulletHoleInstance = $(bulletHole).appendTo('body');
+        setTimeout(() => {
+            $(bulletHoleInstance).remove();
+        }, 350);
+    }, delay);
+}
+
+var was = false;
+const doHelicopterPass = () => {
+    
+    if(was === true){
+        return;
+    }
+    was = true;
+    let styling = `
+            position: fixed;
+            left: 100%;
+            top: 20%;
+            animation: helicopterPass 1.5s linear 1;
+            height: 60%;
+            width: 60%;
+        `;
+
+    const helicopter = `<img src="./helicopter.gif" style="${styling}">`;
+    const helicopterInstance = $(helicopter).appendTo('body');
+    setTimeout(() => {
+        helicopterInstance.remove();   
+    }, 1500);
+}
 
 const validateCollumn = (_collumnValue, _subtableValue) => {
     const collumnValue = Number(_collumnValue);
