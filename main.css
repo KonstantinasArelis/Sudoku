@@ -1,4 +1,5 @@
 .title {
+    margin: 10px;
     display: flex;
     justify-content: center;
 }
@@ -24,32 +25,22 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    align-content: flex-start;
 }
 
 .sudokuWindow {
-    height: 100%;
-    width: 100%;
+    width: 45%;
+    height: 45%;
     aspect-ratio: 1 / 1;
-
-    display: flex;
-    justify-content: center;
-}
-
-.howDoICenterADiv {
-    display: flex;
-    justify-content: center;
 }
 
 .mainGameContainer {
     height: 100%;
     width: 100%;
     display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-}
-
-.sudokuControllsContainer {
-    width: 45%;
-    height: 45%;
 }
 
 #sudokuSubTable {
@@ -87,20 +78,19 @@
 
 .warningContainer {
     width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
+    height: 80%;
 }
 
 .warningBox {
     background-color: rgb(255, 186, 186);
-    padding-top: 20px;
-    padding-bottom: 20px;
-    border-radius: 15px;
-    width: 90%;
     text-align: center;
     font-style: normal;
     font-family: Arial, sans-serif;
+    width: 100%;
+    height: 100%;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    margin: 0;
 }
 
 #messageBox {
@@ -138,13 +128,30 @@
     z-index: 1; 
 }
 
-.simpleButton {
+.submitButton {
+    width: 42%;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    margin: 10px;
     border-radius: 15px;
     background-color: rgb(132, 181, 255);
-    padding: 3%;
-    margin: 1%;
-    width: 100%;
     border: none;
+    text-align: center;
+    font-style: bold;
+    font-family: Arial, sans-serif;
+    font-size: large;
+}
+
+.simpleButton {
+    padding-bottom: 10px;
+    padding-top: 10px;
+    margin: 5px;
+    border-radius: 15px;
+    background-color: rgb(132, 181, 255);
+    border: none;
+    text-align: center;
+    font-style: bold;
+    font-family: Arial, sans-serif;
 }
 
 .simpleText {
@@ -153,11 +160,20 @@
     font-family: Arial, sans-serif;
 }
 
-.footerInfo {
+.headerInfo {
     display: flex;
     justify-content: space-between;
 }
 
-.footerInfo p,a{
-    margin: 5px;
+.headerInfo p,a{
+    margin: 10px;
+    text-align: center;
+    font-style: normal;
+    font-family: Arial, sans-serif;
 }
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; 
+  }

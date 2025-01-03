@@ -1,10 +1,16 @@
 <!DOCTYPE html>
-<html class="temp">
+<html>
 <head>
     <link rel="stylesheet" href="main.css">
     <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
 </head>
 <body>
+    <footer class="headerInfo">
+        <p>Konstantinas Arelis</p>
+        <a href="https://github.com/KonstantinasArelis/Sudoku">
+            Project Source
+        </a>
+    </footer>
     <div class="title">
         <h1>Sudoku</h1>
     </div>
@@ -16,22 +22,15 @@
     </div>
 
     <div class="mainGameContainer">
-        <div class="sudokuControllsContainer">
-            <div class="warningContainer">
-                <p Class="warningBox"></p>
-            </div>
-            <button onClick="submitBoard()" class="simpleButton">Validate</button>
-            <div class="sudokuWindow">
-                <table class="sudokuBoard"></table>
-            </div>
+        
+        <button onClick="submitBoard()" class="submitButton">Submit</button>
+        <div class="sudokuWindow">
+            <table class="sudokuBoard"></table>
         </div>
     </div>
 
-    <footer class="footerInfo">
-        <p>Konstantinas Arelis</p>
-        <a href="https://github.com/KonstantinasArelis/Sudoku">
-            Project Source
-        </a>
+    <footer class="warningContainer">
+        <p Class="warningBox"></p>
     </footer>
     <script src="main.js"></script>
 </body>
