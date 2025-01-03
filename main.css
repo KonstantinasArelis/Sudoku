@@ -152,3 +152,12 @@
     font-style: normal;
     font-family: Arial, sans-serif;
 }
+
+.footerInfo {
+    display: flex;
+    justify-content: space-between;
+}
+
+.footerInfo p,a{
+    margin: 5px;
+}
