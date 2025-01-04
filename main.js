@@ -18,7 +18,6 @@ $(document).ready( function() {
         
         //remove warning styles from table for new validation
         removeBoardNotations();
-        
         validateInput();
     });
 });
@@ -216,7 +215,7 @@ const validateSubTable = (_subtableValue) => {
     const subtableValue = Number(_subtableValue);
     const valuesInSubtable = new Set();
     let subtableIsCorrect = true;
-
+    
     $(`[data-subtable="${subtableValue}"]`).each(function() {
         const value = $(this).find('input').val();
 
@@ -230,7 +229,6 @@ const validateSubTable = (_subtableValue) => {
                     applyWarningCellStyle($(this));
                 }
             })
-            return false;
         } else {
             valuesInSubtable.add(value);
         }
@@ -244,7 +242,6 @@ const validateRow = (_rowValue, _subtableValue) => {
     const valuesInRow = new Set();
     let acceptableSubtableValues;
     let rowIsCorrect = true;
-
     if([0,3,6].includes(subtableValue)){
         acceptableSubtableValues = [subtableValue, subtableValue+1, subtableValue+2];
     } else if([1,4,7].includes(subtableValue)){
@@ -393,25 +390,34 @@ const validateCollumn = (_collumnValue, _subtableValue) => {
 };
 
 const validateInput = () => {
+    
     let tableIsCorrect = true;
-    for(let subtable=0;subtable<=8;subtable++){
-        if(validateSubTable(subtable)){
-            for(let row=0;row<=3;row++){
-                for(let collumn=0;collumn<=3;collumn++){
-                    if(!validateRow(row, subtable)){
-                        tableIsCorrect = false;
-                    }
-                    if(!validateCollumn(collumn, subtable)){
-                        tableIsCorrect = false;
-                    }
-                }
-            }
-        } else {
+    for(let subtable=0;subtable<9;subtable++){
+        console.log("subtable " + subtable)
+        if(!validateSubTable(subtable)){
             tableIsCorrect = false;
         }
     }
+
+    for(let subtable=0; subtable<9; subtable+=3){
+            for(let row=0;row<3;row++){
+                console.log("row " + row)
+                if(!validateRow(row, subtable)){
+                    tableIsCorrect = false;
+                }
+            }
+    }
+
+    for(let subtable=0; subtable<3; subtable++){
+        for(let collumn=0;collumn<3;collumn++){
+            console.log("column " + collumn)
+            if(!validateCollumn(collumn, subtable)){
+                tableIsCorrect = false;
+            }
+        }
+    }
+
     return tableIsCorrect;
-    //inputElement.css('background-color', 'rgb(204, 29, 181)');
 }
 
 const boardCompletionCheck = () => {
