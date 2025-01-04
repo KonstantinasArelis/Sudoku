@@ -16,9 +16,13 @@ $(document).ready( function() {
         let numericValue = inputValue.replace(/[^1-9]/g, '').slice(0, 1);
         $(this).val(numericValue);
         
+        const subtableIndex = $(this).parent().data('subtable');
+        const rowIndex = $(this).parent().data('row');
+        const collumnIndex = $(this).parent().data('collumn');
+
         //remove warning styles from table for new validation
-        removeBoardNotations();
-        validateInput();
+        //removeBoardNotations();
+        validateInput(subtableIndex, rowIndex, collumnIndex);
     });
 });
 
@@ -236,49 +240,54 @@ const validateSubTable = (_subtableValue) => {
     return subtableIsCorrect;
 };
 
-const validateRow = (_rowValue, _subtableValue) => {
-    const rowValue = Number(_rowValue);
-    const subtableValue = Number(_subtableValue);
-    const valuesInRow = new Set();
+const validateRow = (rowValue, subtableValue) => {
+    const row = [];
+    const mistakes = [];
+    const rowValues = new Set();
+    const incorrectValues = new Set();
     let acceptableSubtableValues;
-    let rowIsCorrect = true;
+
     if([0,3,6].includes(subtableValue)){
         acceptableSubtableValues = [subtableValue, subtableValue+1, subtableValue+2];
     } else if([1,4,7].includes(subtableValue)){
         acceptableSubtableValues = [subtableValue-1, subtableValue, subtableValue+1];
     } else if([2,5,8].includes(subtableValue)){
-        acceptableSubtableValues = [subtableValue, subtableValue-1, subtableValue-1];
+        acceptableSubtableValues = [subtableValue-2, subtableValue-1, subtableValue];
     }
 
-    $(`[data-row="${rowValue}"]`).each(function() {
-        if(!(acceptableSubtableValues.includes(Number($(this).attr('data-subtable'))))){
-            return;
+    console.log('indexes: ' + acceptableSubtableValues);
+    for (const subtableIndex of acceptableSubtableValues){
+        // parse elements into an array (element, value)
+        $(`[data-row="${rowValue}"][data-subtable="${subtableIndex}"]`).each(function() {
+            row.push({element: $(this), value: $(this).find('input').val()});
+        });
+    }
+
+    // find duplicates
+    for(const element of row){
+        const value = element.value;
+        
+        if(value === ''){
+            continue;
         }
-        const value = $(this).find('input').val();
-        if(value != '' && valuesInRow.has(value) === true){
-            rowIsCorrect = false;
-            const incorrectValue = value;
-            $(`[data-row="${rowValue}"]`).each(function() {
-                if(acceptableSubtableValues.includes(Number($(this).attr('data-subtable')))){
-                    if(incorrectValue === $(this).find('input').val()){
-                        doHelicopterPass();
-                        applyBulletHole($(this));
-                        applyExplosion($(this));
-                        applyMistakeCellStyle($(this));
-                    } else {
-                        doHelicopterPass();
-                        applyBulletHole($(this));
-                        applyExplosion($(this));
-                        applyWarningCellStyle($(this));
-                    }
-                }
-            })
-            return false;
+
+        if(!rowValues.has(value)){
+            console.log(value);
+            rowValues.add(value);
         } else {
-            valuesInRow.add(value);
+            
+            incorrectValues.add(value);
         }
-    });
-    return rowIsCorrect;
+    }
+
+    for(const temp of row){
+        if(incorrectValues.has(temp.value)){
+            mistakes.push(temp.element);
+        }
+    }
+
+    const onlyRowElements = row.map(row => row.element);
+    return {mistakes: mistakes, row: onlyRowElements};
 };
 
 const applyBulletHole = (element) => {
@@ -389,35 +398,38 @@ const validateCollumn = (_collumnValue, _subtableValue) => {
     return collumnIsCorrect;
 };
 
-const validateInput = () => {
-    
+const validateInput = (subtableIndex, rowIndex, collumnIndex) => {
     let tableIsCorrect = true;
-    for(let subtable=0;subtable<9;subtable++){
-        console.log("subtable " + subtable)
-        if(!validateSubTable(subtable)){
-            tableIsCorrect = false;
-        }
-    }
+        // if(!validateSubTable(subtableIndex)){
+        //     tableIsCorrect = false;
+        // }
+        
+        const validationResult = validateRow(rowIndex, subtableIndex);
+        console.log(validationResult);
+        visualiseRowMistake(validationResult.mistakes, validationResult.row);
 
-    for(let subtable=0; subtable<9; subtable+=3){
-            for(let row=0;row<3;row++){
-                console.log("row " + row)
-                if(!validateRow(row, subtable)){
-                    tableIsCorrect = false;
-                }
-            }
-    }
-
-    for(let subtable=0; subtable<3; subtable++){
-        for(let collumn=0;collumn<3;collumn++){
-            console.log("column " + collumn)
-            if(!validateCollumn(collumn, subtable)){
-                tableIsCorrect = false;
-            }
-        }
-    }
+        // if(!validateCollumn(collumnIndex, subtableIndex)){
+        //     tableIsCorrect = false;
+        // }
 
     return tableIsCorrect;
+}
+
+const visualiseRowMistake = (mistakes, row) => {
+    if(mistakes.length !== 0){
+        for(const cell of row){
+            $(cell).addClass('rowWarning');
+        }
+        for (const cell of mistakes){
+            $(cell).addClass('rowMistake');
+        }
+        tableIsCorrect = false;
+    } else {
+        for (const cell of row){
+            $(cell).removeClass('rowWarning');
+            $(cell).removeClass('rowMistake');
+        }
+    }
 }
 
 const boardCompletionCheck = () => {
@@ -438,12 +450,49 @@ const applyMissingValueStyle = (element) => {
     element.addClass('cellMissingValue');
 }
 
-const applyWarningCellStyle = (element) => {
-    element.addClass('cellWarning');
+const applyWarningCellStyle = (element, type) => {
+    //element.addClass('cellWarning');
+
+    switch (type) {
+        case 'row':
+
+        break;
+        case 'collumn':
+
+        break;
+        case 'subtable':
+
+        break;
+    }
 }
 
-const applyMistakeCellStyle = (element) => {
+const applyMistakeCellStyle = (element, type) => {
     element.addClass('cellMistake');
+}
+
+
+const applyRowMistakeStyle = (element) => {
+    element.addClass('rowMistake');
+}
+
+const applySubtableMistakeStyle = (element) => {
+    element.addClass('subtableMistake');
+}
+
+const applyCollumnMistakeStyle = (element) => {
+    element.addClass('collumnMistake');
+}
+
+const applyRowWarningStyle = (element) => {
+    element.addClass('rowWarning');
+}
+
+const applySubtableWarningStyle = (element) => {
+    element.addClass('subtableWarning');
+}
+
+const applyCollumnWarningStyle = (element) => {
+    element.addClass('collumnWarning');
 }
 
 const submitBoard = () => {

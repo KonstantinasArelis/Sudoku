@@ -64,11 +64,11 @@
     background-color: transparent;
 }
 
-.cellWarning {
+.cellWarning, .rowWarning, .subtableWarning, .collumnWarning  {
     background-color: rgb(255, 229, 111);
 }
 
-.cellMistake {
+.cellMistake, .rowMistake, .subtableMistake, .collumnMistake{
     background-color: rgb(255, 188, 111);
 }
 
