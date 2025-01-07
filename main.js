@@ -10,6 +10,7 @@ const hardCodedAnswer = {
     "id": "1"
 }
 
+
 $(document).ready( function() {
     $(document).on('input', '.sudokuInput', function(e) {
         let inputValue = $(this).val();
@@ -20,7 +21,7 @@ $(document).ready( function() {
         const rowIndex = $(this).parent().data('row');
         const collumnIndex = $(this).parent().data('collumn');
 
-        validateInput(subtableIndex, rowIndex, collumnIndex);
+        handleInput(subtableIndex, rowIndex, collumnIndex);
     });
 });
 
@@ -411,25 +412,29 @@ const doHelicopterPass = () => {
     }, 1500);
 }
 
-const validateInput = (subtableIndex, rowIndex, collumnIndex) => {
-    let tableIsCorrect = true;
-
+const handleInput = (subtableIndex, rowIndex, collumnIndex) => {
     const rowValidationResult = validateRow(rowIndex, subtableIndex);
     //console.log(rowValidationResult);
-    visualiseRowMistake(rowValidationResult.mistakes, rowValidationResult.row);
+    visualiseRow(rowValidationResult.mistakes, rowValidationResult.row);
 
     const subtableValidationResult = validateSubtable(subtableIndex);
     //console.log(subtableValidationResult);
-    visualiseSubtableMistake(subtableValidationResult.mistakes, subtableValidationResult.subtable);
+    visualiseSubtable(subtableValidationResult.mistakes, subtableValidationResult.subtable);
 
     const collumnValidationResult = validateCollumn(collumnIndex, subtableIndex);
     //console.log(collumnValidationResult);
-    visualiseCollumnMistake(collumnValidationResult.mistakes, collumnValidationResult.collumn);
+    visualiseCollumn(collumnValidationResult.mistakes, collumnValidationResult.collumn);
 
-    return tableIsCorrect;
+    $('td').removeClass('cellMissingValue');
+
+    if(rowValidationResult.mistakes.length === 0 && subtableValidationResult.mistakes.length === 0  && collumnValidationResult.mistakes.length === 0 ){
+        return true;
+    } else {
+        return false;
+    }
 }
 
-const visualiseRowMistake = (mistakes, row) => {
+const visualiseRow = (mistakes, row) => {
     row.reverse();
     mistakes.reverse();
     if(mistakes.length !== 0){
@@ -456,7 +461,7 @@ const visualiseRowMistake = (mistakes, row) => {
     }
 }
 
-const visualiseCollumnMistake = (mistakes, collumn) => {
+const visualiseCollumn = (mistakes, collumn) => {
     if(mistakes.length !== 0){
         for(const cell of collumn){
             $(cell).addClass('collumnWarning');
@@ -473,7 +478,7 @@ const visualiseCollumnMistake = (mistakes, collumn) => {
     }
 }
 
-const visualiseSubtableMistake = (mistakes, subtable) => {
+const visualiseSubtable = (mistakes, subtable) => {
     if(mistakes.length !== 0){
         for(const cell of subtable){
             $(cell).addClass('subtableWarning');
@@ -497,15 +502,11 @@ const boardCompletionCheck = () => {
         board.find('.sudokuInput').each(function() {
             if($(this).val() === ''){
                 isComplete = false;
-                applyMissingValueStyle($(this));
+                $(this).parent().addClass('cellMissingValue');
             }
         });
     });
     return isComplete;
-}
-
-const applyMissingValueStyle = (element) => {
-    element.addClass('cellMissingValue');
 }
 
 const applyMistakeCellStyle = (element, type) => {
@@ -521,16 +522,10 @@ const submitBoard = () => {
         let text = '<p class="simpleText"> You have to fill out all free cells in sudoku';
         
         $('#messageBoxContent').append(text);
-    } else if(!validateInput()){
-        completedSuccefully = false;
-        displayMessageBox();
-        let text = '<p class="simpleText"> The board is incorrect';
-        
-        $('#messageBoxContent').append(text);
     } else if(getCurrentBoardString() !== boardSolution){
         completedSuccefully = false;
         displayMessageBox();
-        let text = '<p class="simpleText"> The board looks correct, but it does not match the pre-defined answer';
+        let text = '<p class="simpleText"> The board is incorrect';
         
         $('#messageBoxContent').append(text);
     }

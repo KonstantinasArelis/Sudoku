@@ -64,16 +64,16 @@
     background-color: transparent;
 }
 
+.cellMissingValue {
+    background-color: rgb(255, 186, 186);
+}
+
 .cellWarning, .rowWarning, .subtableWarning, .collumnWarning  {
     background-color: rgb(255, 229, 111);
 }
 
 .cellMistake, .rowMistake, .subtableMistake, .collumnMistake{
     background-color: rgb(255, 188, 111);
-}
-
-.cellMissingValue {
-    background-color: rgb(255, 186, 186);
 }
 
 .warningContainer {
