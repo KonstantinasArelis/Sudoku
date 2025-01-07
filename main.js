@@ -20,8 +20,6 @@ $(document).ready( function() {
         const rowIndex = $(this).parent().data('row');
         const collumnIndex = $(this).parent().data('collumn');
 
-        //remove warning styles from table for new validation
-        //removeBoardNotations();
         validateInput(subtableIndex, rowIndex, collumnIndex);
     });
 });
@@ -350,31 +348,31 @@ const validateRow = (rowValue, subtableValue) => {
     return {mistakes: mistakes, row: onlyRowElements};
 };
 
-const applyBulletHole = (element) => {
-    const duration = (Math.random()+1) * 2;
-    const position = $(element).offset();
-    const offsetX = Math.random() * $(element).width() + position.left;
-    const offsetY = Math.random() * $(element).height() + position.top;
-
-    let styling = `
-        position: absolute;
-        left: ${offsetX}px;
-        top: ${offsetY}px;
-        width: 20px;
-        height: 20px;
-        animation: fadeOut ${duration}s linear 1;
-    `;
-    let bulletHole = `<img src = "./bulletImpact.png" style="${styling}" class="bulletHole">`
-    let bulletHoleInstance = $(bulletHole).appendTo('body');
+const applyBulletHole = (element, delay) => {
     setTimeout(() => {
-        $(bulletHoleInstance).remove();
-    }, duration * 950);
+        const duration = (Math.random()+1) * 2;
+        const position = $(element).offset();
+        const offsetX = Math.random() * $(element).width() + position.left;
+        const offsetY = Math.random() * $(element).height() + position.top;
+
+        let styling = `
+            position: absolute;
+            left: ${offsetX}px;
+            top: ${offsetY}px;
+            width: 20px;
+            height: 20px;
+            animation: fadeOut ${duration}s linear 1;
+        `;
+        let bulletHole = `<img src = "./bulletImpact.png" style="${styling}" class="bulletHole">`
+        let bulletHoleInstance = $(bulletHole).appendTo('body');
+
+        setTimeout(() => {
+            $(bulletHoleInstance).remove();
+        }, duration * 950);
+    }, delay)
 }
 
-const applyExplosion = (element) => {
-    const delay = Math.random() * 500;
-
-
+const applyExplosion = (element, delay) => {
     setTimeout(() => {
         const position = $(element).offset();
         const offsetX = (Math.random() - 0.5) * $(element).width()  + position.left;
@@ -395,17 +393,12 @@ const applyExplosion = (element) => {
     }, delay);
 }
 
-var was = false;
 const doHelicopterPass = () => {
-    
-    if(was === true){
-        return;
-    }
-    was = true;
+    const verticalPosition = (Math.random() - 0.5) * 80;
     let styling = `
             position: fixed;
             left: 100%;
-            top: 20%;
+            top: ${verticalPosition}%;
             animation: helicopterPass 1.5s linear 1;
             height: 60%;
             width: 60%;
@@ -437,8 +430,18 @@ const validateInput = (subtableIndex, rowIndex, collumnIndex) => {
 }
 
 const visualiseRowMistake = (mistakes, row) => {
+    row.reverse();
+    mistakes.reverse();
     if(mistakes.length !== 0){
+        doHelicopterPass();
+
+        // delay to make the visuals sequential
+        let delay = 0;
+
         for(const cell of row){
+            delay+= 100;
+            applyBulletHole(cell, delay);
+            applyExplosion(cell, delay);
             $(cell).addClass('rowWarning');
         }
         for (const cell of mistakes){
