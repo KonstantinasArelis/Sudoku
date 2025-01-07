@@ -59,7 +59,6 @@ const fetchCorrectBoard = () => {
         const board = data.solution;
         return board;
     }).catch(error => {
-        console.log(error);
         return hardCodedAnswer.solution;
     })
 };
@@ -80,7 +79,6 @@ const fetchBoard = () => {
     }).then(data => {
         return data.board;
     }).catch(error => {
-        console.error('Error:' + error);
         $('.warningContainer').show();
         $('.warningBox').text("API not active, using pre-defined sudoku board");
         return hardCodedBoard.board;
@@ -202,12 +200,7 @@ const fillBoard = () => {
                 cellIndex = 0;
                 subTableIndex++;
             }
-
-
                 $(`td[data-subtable="${subTableIndex}"][data-row="${rowIndex}"][data-collumn="${cellIndex}"]`).html('<input class="sudokuInput" type="numeric" min="1" max="9" value="' + boardSolution[j+ i * 9] + '">');
-            
-            
-    
             cellIndex++;
         }
         subTableIndex -= 3;
@@ -215,29 +208,95 @@ const fillBoard = () => {
     }
 };
 
-const validateSubTable = (_subtableValue) => {
-    const subtableValue = Number(_subtableValue);
-    const valuesInSubtable = new Set();
-    let subtableIsCorrect = true;
+const validateSubtable = (subtableValue) => {
+    const subtable = [];
+    const mistakes = [];
+    const subTableValues = new Set();
+    const incorrectValues = new Set();
     
+    // parse elements into an array (element, value)
     $(`[data-subtable="${subtableValue}"]`).each(function() {
-        const value = $(this).find('input').val();
-
-        if(value != '' && valuesInSubtable.has(value) === true){
-            subtableIsCorrect = false;
-            const incorrectValue = value;
-            $(`[data-subtable="${subtableValue}"]`).each(function() {
-                if(incorrectValue === $(this).find('input').val()){
-                    applyMistakeCellStyle($(this));
-                } else {
-                    applyWarningCellStyle($(this));
-                }
-            })
-        } else {
-            valuesInSubtable.add(value);
-        }
+        subtable.push({element: $(this), value: $(this).find('input').val()});
     });
-    return subtableIsCorrect;
+
+    // find duplicates and load them into incorrectValues
+    for(const element of subtable){
+        const value = element.value;
+        
+        if(value === ''){
+            continue;
+        }
+
+        if(!subTableValues.has(value)){
+            subTableValues.add(value);
+        } else {
+            incorrectValues.add(value);
+        }
+    }
+
+    // populate mistakes array with elements with errors
+    for(const temp of subtable){
+        if(incorrectValues.has(temp.value)){
+            mistakes.push(temp.element);
+        }
+    }
+
+    // create array for all the elements that were in the row
+    const onlySubtableElements = subtable.map(subtable => subtable.element);
+
+    return {mistakes: mistakes, subtable: onlySubtableElements};
+};
+
+const validateCollumn = (collumnValue, subtableValue) => {
+    const collumn = [];
+    const mistakes = [];
+    const collumnValues = new Set();
+    const incorrectValues = new Set();
+    let acceptableSubtableValues;
+
+    if([0,1,2].includes(subtableValue)){
+        acceptableSubtableValues = [subtableValue, subtableValue+3, subtableValue+6];
+    } else if([3,4,5].includes(subtableValue)){
+        acceptableSubtableValues = [subtableValue-3, subtableValue, subtableValue+3];
+    } else if([6,7,8].includes(subtableValue)){
+        acceptableSubtableValues = [subtableValue, subtableValue-3, subtableValue-6];
+    }
+
+    
+    for (const subtableIndex of acceptableSubtableValues){
+        // parse elements into an array (element, value)
+        $(`[data-collumn="${collumnValue}"][data-subtable="${subtableIndex}"]`).each(function() {
+            collumn.push({element: $(this), value: $(this).find('input').val()});
+        });
+    }
+
+    // find duplicates and load them into incorrectValues
+    for(const element of collumn){
+        const value = element.value;
+        
+        if(value === ''){
+            continue;
+        }
+
+        if(!collumnValues.has(value)){
+            collumnValues.add(value);
+        } else {
+            
+            incorrectValues.add(value);
+        }
+    }
+
+    // populate mistakes array with elements with errors
+    for(const temp of collumn){
+        if(incorrectValues.has(temp.value)){
+            mistakes.push(temp.element);
+        }
+    }
+
+    // create array for all the elements that were in the row
+    const onlyCollumnElements = collumn.map(collumn => collumn.element);
+
+    return {mistakes: mistakes, collumn: onlyCollumnElements};
 };
 
 const validateRow = (rowValue, subtableValue) => {
@@ -255,7 +314,7 @@ const validateRow = (rowValue, subtableValue) => {
         acceptableSubtableValues = [subtableValue-2, subtableValue-1, subtableValue];
     }
 
-    console.log('indexes: ' + acceptableSubtableValues);
+    
     for (const subtableIndex of acceptableSubtableValues){
         // parse elements into an array (element, value)
         $(`[data-row="${rowValue}"][data-subtable="${subtableIndex}"]`).each(function() {
@@ -263,7 +322,7 @@ const validateRow = (rowValue, subtableValue) => {
         });
     }
 
-    // find duplicates
+    // find duplicates and load them into incorrectValues
     for(const element of row){
         const value = element.value;
         
@@ -272,21 +331,22 @@ const validateRow = (rowValue, subtableValue) => {
         }
 
         if(!rowValues.has(value)){
-            console.log(value);
             rowValues.add(value);
         } else {
-            
             incorrectValues.add(value);
         }
     }
 
+    // populate mistakes array with elements with errors
     for(const temp of row){
         if(incorrectValues.has(temp.value)){
             mistakes.push(temp.element);
         }
     }
 
+    // create array for all the elements that were in the row
     const onlyRowElements = row.map(row => row.element);
+
     return {mistakes: mistakes, row: onlyRowElements};
 };
 
@@ -358,59 +418,20 @@ const doHelicopterPass = () => {
     }, 1500);
 }
 
-const validateCollumn = (_collumnValue, _subtableValue) => {
-    const collumnValue = Number(_collumnValue);
-    const subtableValue = Number(_subtableValue);
-    const valuesInRow = new Set();
-    let acceptableSubtableValues;
-    let collumnIsCorrect = true;
-    if([0,1,2].includes(subtableValue)){
-        acceptableSubtableValues = [subtableValue, subtableValue+3, subtableValue+6];
-    } else if([3,4,5].includes(subtableValue)){
-        acceptableSubtableValues = [subtableValue-3, subtableValue, subtableValue+3];
-    } else if([6,7,8].includes(subtableValue)){
-        acceptableSubtableValues = [subtableValue, subtableValue-3, subtableValue-6];
-    }
-
-
-    $(`[data-collumn="${collumnValue}"]`).each(function() {
-        if(!(acceptableSubtableValues.includes(Number($(this).attr('data-subtable'))))){
-            return;
-        }
-        const value = $(this).find('input').val();
-        if(value != '' && valuesInRow.has(value) === true){
-            const incorrectValue = value;
-            collumnIsCorrect = false;
-            $(`[data-collumn="${collumnValue}"]`).each(function() {
-                if(acceptableSubtableValues.includes(Number($(this).attr('data-subtable')))){
-                    if(incorrectValue === $(this).find('input').val()){
-                        applyMistakeCellStyle($(this));
-                    } else {
-                        applyWarningCellStyle($(this));
-                    }
-                }
-            })
-            return false;
-        } else {
-            valuesInRow.add(value);
-        }
-    });
-    return collumnIsCorrect;
-};
-
 const validateInput = (subtableIndex, rowIndex, collumnIndex) => {
     let tableIsCorrect = true;
-        // if(!validateSubTable(subtableIndex)){
-        //     tableIsCorrect = false;
-        // }
-        
-        const validationResult = validateRow(rowIndex, subtableIndex);
-        console.log(validationResult);
-        visualiseRowMistake(validationResult.mistakes, validationResult.row);
 
-        // if(!validateCollumn(collumnIndex, subtableIndex)){
-        //     tableIsCorrect = false;
-        // }
+    const rowValidationResult = validateRow(rowIndex, subtableIndex);
+    //console.log(rowValidationResult);
+    visualiseRowMistake(rowValidationResult.mistakes, rowValidationResult.row);
+
+    const subtableValidationResult = validateSubtable(subtableIndex);
+    //console.log(subtableValidationResult);
+    visualiseSubtableMistake(subtableValidationResult.mistakes, subtableValidationResult.subtable);
+
+    const collumnValidationResult = validateCollumn(collumnIndex, subtableIndex);
+    //console.log(collumnValidationResult);
+    visualiseCollumnMistake(collumnValidationResult.mistakes, collumnValidationResult.collumn);
 
     return tableIsCorrect;
 }
@@ -428,6 +449,40 @@ const visualiseRowMistake = (mistakes, row) => {
         for (const cell of row){
             $(cell).removeClass('rowWarning');
             $(cell).removeClass('rowMistake');
+        }
+    }
+}
+
+const visualiseCollumnMistake = (mistakes, collumn) => {
+    if(mistakes.length !== 0){
+        for(const cell of collumn){
+            $(cell).addClass('collumnWarning');
+        }
+        for (const cell of mistakes){
+            $(cell).addClass('collumnMistake');
+        }
+        tableIsCorrect = false;
+    } else {
+        for (const cell of collumn){
+            $(cell).removeClass('collumnWarning');
+            $(cell).removeClass('collumnMistake');
+        }
+    }
+}
+
+const visualiseSubtableMistake = (mistakes, subtable) => {
+    if(mistakes.length !== 0){
+        for(const cell of subtable){
+            $(cell).addClass('subtableWarning');
+        }
+        for (const cell of mistakes){
+            $(cell).addClass('subtableMistake');
+        }
+        tableIsCorrect = false;
+    } else {
+        for (const cell of subtable){
+            $(cell).removeClass('subtableWarning');
+            $(cell).removeClass('subtableMistake');
         }
     }
 }
@@ -450,49 +505,8 @@ const applyMissingValueStyle = (element) => {
     element.addClass('cellMissingValue');
 }
 
-const applyWarningCellStyle = (element, type) => {
-    //element.addClass('cellWarning');
-
-    switch (type) {
-        case 'row':
-
-        break;
-        case 'collumn':
-
-        break;
-        case 'subtable':
-
-        break;
-    }
-}
-
 const applyMistakeCellStyle = (element, type) => {
     element.addClass('cellMistake');
-}
-
-
-const applyRowMistakeStyle = (element) => {
-    element.addClass('rowMistake');
-}
-
-const applySubtableMistakeStyle = (element) => {
-    element.addClass('subtableMistake');
-}
-
-const applyCollumnMistakeStyle = (element) => {
-    element.addClass('collumnMistake');
-}
-
-const applyRowWarningStyle = (element) => {
-    element.addClass('rowWarning');
-}
-
-const applySubtableWarningStyle = (element) => {
-    element.addClass('subtableWarning');
-}
-
-const applyCollumnWarningStyle = (element) => {
-    element.addClass('collumnWarning');
 }
 
 const submitBoard = () => {
