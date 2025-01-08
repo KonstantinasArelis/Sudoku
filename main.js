@@ -1,19 +1,9 @@
-import {applyBulletHole, applyExplosion, doHelicopterPass,
-        visualiseRow, visualiseCollumn, visualiseSubtable,
+import {visualiseRow, visualiseCollumn, visualiseSubtable,
         removeBoardNotations, displayMessageBox, disableMessageBox,} from './visualization.js';
 
-const hardCodedBoard = {
-    "width": 9,
-    "height": 9,
-    "board": "53xx7xxxx6xx195xxxx98xxxx6x8xxx6xxx34xx8x3xx17xxx2xxx6x6xxxx28xxxx419xx5xxxx8xx79",
-    "id": "1" 
-}
+import {validateSubtable, validateCollumn, validateRow} from './validation.js';
 
-const hardCodedAnswer = {
-    "solution": "534678912672195348198342567859761423426853791713924856961537284287419635345286179",
-    "id": "1"
-}
-
+import {hardCodedBoard, hardCodedAnswer, getCurrentBoardString, boardToIndex, createBoard} from './utlity.js';
 
 $(document).ready( function() {
     $(document).on('input', '.sudokuInput', function(e) {
@@ -115,63 +105,6 @@ const populareBoard = (board) => {
     }
 };
 
-const boardToIndex = (_subTableIndex, _rowIndex, _cellIndex) => {
-    let rowIndex = 0;
-    let cellIndex = 0;
-    let subTableIndex = 0;
-
-    for (let i = 0;i < 9; i++)
-        {
-            if ((rowIndex) % 3 === 0 && rowIndex!=0)
-            {
-                rowIndex = 0;
-                subTableIndex += 3;
-            }
-
-            for (let j = 0;j < 9; j++)
-            {
-                if ((cellIndex) % 3 === 0  && cellIndex!=0)
-                {
-                    cellIndex = 0;
-                    subTableIndex++;
-                }
-                if(_subTableIndex ===  subTableIndex && _rowIndex === rowIndex && _cellIndex === cellIndex){
-                    return j + i * 9;
-                }
-                cellIndex++;
-            }
-            subTableIndex -= 3;
-            rowIndex++;
-        }
-};
-
-const createBoard = () => {
-    $(document).ready(function() {
-        var table = $('.sudokuBoard');
-        
-        for (let i = 0;i < 9; i++)
-        {
-            var subTable = $('<table>');
-            $(subTable).attr('id', 'sudokuSubTable');
-            for (let j = 0; j < 3; j++)
-            {
-                var row = $('<tr>');
-                for (let k = 0; k < 3; k++)
-                {
-                    var cell = $('<td>');
-                    $(cell).attr('data-subtable', i);
-                    $(cell).attr('data-row', j);
-                    $(cell).attr('data-collumn', k);
-
-                    row.append(cell);
-                }
-                subTable.append(row);
-            }
-            table.append(subTable);
-        } 
-    });
-};
-
 const fillBoard = () => {
     let rowIndex = 0;
     let cellIndex = 0;
@@ -198,148 +131,6 @@ const fillBoard = () => {
         subTableIndex -= 3;
         rowIndex++;
     }
-};
-
-const validateSubtable = (subtableValue) => {
-    const subtable = [];
-    const mistakes = [];
-    const subTableValues = new Set();
-    const incorrectValues = new Set();
-    
-    // parse elements into an array (element, value)
-    $(`[data-subtable="${subtableValue}"]`).each(function() {
-        subtable.push({element: $(this), value: $(this).find('input').val()});
-    });
-
-    // find duplicates and load them into incorrectValues
-    for(const element of subtable){
-        const value = element.value;
-        
-        if(value === ''){
-            continue;
-        }
-
-        if(!subTableValues.has(value)){
-            subTableValues.add(value);
-        } else {
-            incorrectValues.add(value);
-        }
-    }
-
-    // populate mistakes array with elements with errors
-    for(const temp of subtable){
-        if(incorrectValues.has(temp.value)){
-            mistakes.push(temp.element);
-        }
-    }
-
-    // create array for all the elements that were in the row
-    const onlySubtableElements = subtable.map(subtable => subtable.element);
-
-    return {mistakes: mistakes, subtable: onlySubtableElements};
-};
-
-const validateCollumn = (collumnValue, subtableValue) => {
-    const collumn = [];
-    const mistakes = [];
-    const collumnValues = new Set();
-    const incorrectValues = new Set();
-    let acceptableSubtableValues;
-
-    if([0,1,2].includes(subtableValue)){
-        acceptableSubtableValues = [subtableValue, subtableValue+3, subtableValue+6];
-    } else if([3,4,5].includes(subtableValue)){
-        acceptableSubtableValues = [subtableValue-3, subtableValue, subtableValue+3];
-    } else if([6,7,8].includes(subtableValue)){
-        acceptableSubtableValues = [subtableValue, subtableValue-3, subtableValue-6];
-    }
-
-    
-    for (const subtableIndex of acceptableSubtableValues){
-        // parse elements into an array (element, value)
-        $(`[data-collumn="${collumnValue}"][data-subtable="${subtableIndex}"]`).each(function() {
-            collumn.push({element: $(this), value: $(this).find('input').val()});
-        });
-    }
-
-    // find duplicates and load them into incorrectValues
-    for(const element of collumn){
-        const value = element.value;
-        
-        if(value === ''){
-            continue;
-        }
-
-        if(!collumnValues.has(value)){
-            collumnValues.add(value);
-        } else {
-            
-            incorrectValues.add(value);
-        }
-    }
-
-    // populate mistakes array with elements with errors
-    for(const temp of collumn){
-        if(incorrectValues.has(temp.value)){
-            mistakes.push(temp.element);
-        }
-    }
-
-    // create array for all the elements that were in the row
-    const onlyCollumnElements = collumn.map(collumn => collumn.element);
-
-    return {mistakes: mistakes, collumn: onlyCollumnElements};
-};
-
-const validateRow = (rowValue, subtableValue) => {
-    const row = [];
-    const mistakes = [];
-    const rowValues = new Set();
-    const incorrectValues = new Set();
-    let acceptableSubtableValues;
-
-    if([0,3,6].includes(subtableValue)){
-        acceptableSubtableValues = [subtableValue, subtableValue+1, subtableValue+2];
-    } else if([1,4,7].includes(subtableValue)){
-        acceptableSubtableValues = [subtableValue-1, subtableValue, subtableValue+1];
-    } else if([2,5,8].includes(subtableValue)){
-        acceptableSubtableValues = [subtableValue-2, subtableValue-1, subtableValue];
-    }
-
-    
-    for (const subtableIndex of acceptableSubtableValues){
-        // parse elements into an array (element, value)
-        $(`[data-row="${rowValue}"][data-subtable="${subtableIndex}"]`).each(function() {
-            row.push({element: $(this), value: $(this).find('input').val()});
-        });
-    }
-
-    // find duplicates and load them into incorrectValues
-    for(const element of row){
-        const value = element.value;
-        
-        if(value === ''){
-            continue;
-        }
-
-        if(!rowValues.has(value)){
-            rowValues.add(value);
-        } else {
-            incorrectValues.add(value);
-        }
-    }
-
-    // populate mistakes array with elements with errors
-    for(const temp of row){
-        if(incorrectValues.has(temp.value)){
-            mistakes.push(temp.element);
-        }
-    }
-
-    // create array for all the elements that were in the row
-    const onlyRowElements = row.map(row => row.element);
-
-    return {mistakes: mistakes, row: onlyRowElements};
 };
 
 const handleInput = (subtableIndex, rowIndex, collumnIndex) => {
@@ -430,38 +221,6 @@ const revealAnswer = () => {
     fillBoard();
     boardWasFilled = true;
 }
-
-
-const getCurrentBoardString = () => {
-    let boardString = '';
-
-    let rowIndex = 0;
-    let cellIndex = 0;
-    let subTableIndex = 0;
-
-    for (let i = 0; i < 9; i++) {
-        if ((rowIndex) % 3 === 0 && rowIndex != 0) {
-            rowIndex = 0;
-            subTableIndex += 3;
-        }
-
-        for (let j = 0; j < 9; j++) {
-            if ((cellIndex) % 3 === 0 && cellIndex != 0) {
-                cellIndex = 0;
-                subTableIndex++;
-            }
-            inputedValue = $(`td[data-subtable="${subTableIndex}"][data-row="${rowIndex}"][data-collumn="${cellIndex}"]`).find('input').val();
-            boardString += inputedValue;
-            
-            cellIndex++;
-        }
-        subTableIndex -= 3;
-        rowIndex++;
-    }
-
-    return boardString;
-};
-
 
 let boardSolution;
 let defaultBoard;
