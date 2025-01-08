@@ -1,3 +1,7 @@
+import {applyBulletHole, applyExplosion, doHelicopterPass,
+        visualiseRow, visualiseCollumn, visualiseSubtable,
+        removeBoardNotations, displayMessageBox, disableMessageBox,} from './visualization.js';
+
 const hardCodedBoard = {
     "width": 9,
     "height": 9,
@@ -24,23 +28,6 @@ $(document).ready( function() {
         handleInput(subtableIndex, rowIndex, collumnIndex);
     });
 });
-
-const removeBoardNotations = () => {
-    $(".sudokuBoard *").removeClass("cellWarning");
-    $(".sudokuBoard *").removeClass("cellMistake");
-    $(".sudokuBoard *").removeClass("cellMissingValue");
-}
-
-const displayMessageBox = () => {
-    $('#messageBox').show();
-    $('.overlay').show();
-}
-
-const disableMessageBox = () => {
-    $('#messageBox').hide();
-    $('.overlay').hide();
-    $('#messageBoxContent').empty();
-}
 
 const fetchCorrectBoard = () => {
     //const url = "https://6550e0cc7d203ab6626e476a.mockapi.io/api/v1/SudokuSolutions/1?fbclid=IwAR1uZmkq26ItDU29_qR9VRA87BMH0vMyFLo5NdDOb-2EsGP8dH8aXC997Mw";
@@ -349,69 +336,6 @@ const validateRow = (rowValue, subtableValue) => {
     return {mistakes: mistakes, row: onlyRowElements};
 };
 
-const applyBulletHole = (element, delay) => {
-    setTimeout(() => {
-        const duration = (Math.random()+1) * 2;
-        const position = $(element).offset();
-        const offsetX = Math.random() * $(element).width() + position.left;
-        const offsetY = Math.random() * $(element).height() + position.top;
-
-        let styling = `
-            position: absolute;
-            left: ${offsetX}px;
-            top: ${offsetY}px;
-            width: 20px;
-            height: 20px;
-            animation: fadeOut ${duration}s linear 1;
-        `;
-        let bulletHole = `<img src = "./bulletImpact.png" style="${styling}" class="bulletHole">`
-        let bulletHoleInstance = $(bulletHole).appendTo('body');
-
-        setTimeout(() => {
-            $(bulletHoleInstance).remove();
-        }, duration * 950);
-    }, delay)
-}
-
-const applyExplosion = (element, delay) => {
-    setTimeout(() => {
-        const position = $(element).offset();
-        const offsetX = (Math.random() - 0.5) * $(element).width()  + position.left;
-        const offsetY = (Math.random() - 0.5) * $(element).height() + position.top;
-
-        let styling = `
-            position: absolute;
-            left: ${offsetX}px;
-            top: ${offsetY}px;
-            width: 100px;
-            height: 100px;
-        `;
-        let bulletHole = `<img src = "./explosion.gif" style="${styling}">`
-        let bulletHoleInstance = $(bulletHole).appendTo('body');
-        setTimeout(() => {
-            $(bulletHoleInstance).remove();
-        }, 350);
-    }, delay);
-}
-
-const doHelicopterPass = () => {
-    const verticalPosition = (Math.random() - 0.5) * 80;
-    let styling = `
-            position: fixed;
-            left: 100%;
-            top: ${verticalPosition}%;
-            animation: helicopterPass 1.5s linear 1;
-            height: 60%;
-            width: 60%;
-        `;
-
-    const helicopter = `<img src="./helicopter.gif" style="${styling}">`;
-    const helicopterInstance = $(helicopter).appendTo('body');
-    setTimeout(() => {
-        helicopterInstance.remove();   
-    }, 1500);
-}
-
 const handleInput = (subtableIndex, rowIndex, collumnIndex) => {
     const rowValidationResult = validateRow(rowIndex, subtableIndex);
     //console.log(rowValidationResult);
@@ -434,67 +358,6 @@ const handleInput = (subtableIndex, rowIndex, collumnIndex) => {
     }
 }
 
-const visualiseRow = (mistakes, row) => {
-    row.reverse();
-    mistakes.reverse();
-    if(mistakes.length !== 0){
-        doHelicopterPass();
-
-        // delay to make the visuals sequential
-        let delay = 0;
-
-        for(const cell of row){
-            delay+= 100;
-            applyBulletHole(cell, delay);
-            applyExplosion(cell, delay);
-            $(cell).addClass('rowWarning');
-        }
-        for (const cell of mistakes){
-            $(cell).addClass('rowMistake');
-        }
-        tableIsCorrect = false;
-    } else {
-        for (const cell of row){
-            $(cell).removeClass('rowWarning');
-            $(cell).removeClass('rowMistake');
-        }
-    }
-}
-
-const visualiseCollumn = (mistakes, collumn) => {
-    if(mistakes.length !== 0){
-        for(const cell of collumn){
-            $(cell).addClass('collumnWarning');
-        }
-        for (const cell of mistakes){
-            $(cell).addClass('collumnMistake');
-        }
-        tableIsCorrect = false;
-    } else {
-        for (const cell of collumn){
-            $(cell).removeClass('collumnWarning');
-            $(cell).removeClass('collumnMistake');
-        }
-    }
-}
-
-const visualiseSubtable = (mistakes, subtable) => {
-    if(mistakes.length !== 0){
-        for(const cell of subtable){
-            $(cell).addClass('subtableWarning');
-        }
-        for (const cell of mistakes){
-            $(cell).addClass('subtableMistake');
-        }
-        tableIsCorrect = false;
-    } else {
-        for (const cell of subtable){
-            $(cell).removeClass('subtableWarning');
-            $(cell).removeClass('subtableMistake');
-        }
-    }
-}
-
 const boardCompletionCheck = () => {
     let isComplete = true;
     $(document).ready(function() {
@@ -507,10 +370,6 @@ const boardCompletionCheck = () => {
         });
     });
     return isComplete;
-}
-
-const applyMistakeCellStyle = (element, type) => {
-    element.addClass('cellMistake');
 }
 
 const submitBoard = () => {
