@@ -79,7 +79,6 @@ export const visualiseRow = (mistakes, row) => {
         for (const cell of mistakes){
             $(cell).addClass('rowMistake');
         }
-        tableIsCorrect = false;
     } else {
         for (const cell of row){
             $(cell).removeClass('rowWarning');
@@ -96,7 +95,6 @@ export const visualiseCollumn = (mistakes, collumn) => {
         for (const cell of mistakes){
             $(cell).addClass('collumnMistake');
         }
-        tableIsCorrect = false;
     } else {
         for (const cell of collumn){
             $(cell).removeClass('collumnWarning');
@@ -113,7 +111,6 @@ export const visualiseSubtable = (mistakes, subtable) => {
         for (const cell of mistakes){
             $(cell).addClass('subtableMistake');
         }
-        tableIsCorrect = false;
     } else {
         for (const cell of subtable){
             $(cell).removeClass('subtableWarning');

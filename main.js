@@ -27,7 +27,13 @@ $(document).ready( function() {
 
         handleInput(subtableIndex, rowIndex, collumnIndex);
     });
+
+    $(document).on('click', '.submitButton', function(e) {
+        submitBoard();
+    })
 });
+
+
 
 const fetchCorrectBoard = () => {
     //const url = "https://6550e0cc7d203ab6626e476a.mockapi.io/api/v1/SudokuSolutions/1?fbclid=IwAR1uZmkq26ItDU29_qR9VRA87BMH0vMyFLo5NdDOb-2EsGP8dH8aXC997Mw";
