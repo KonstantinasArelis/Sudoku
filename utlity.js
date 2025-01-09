@@ -28,7 +28,7 @@ export const getCurrentBoardString = () => {
                 cellIndex = 0;
                 subTableIndex++;
             }
-            inputedValue = $(`td[data-subtable="${subTableIndex}"][data-row="${rowIndex}"][data-collumn="${cellIndex}"]`).find('input').val();
+            const inputedValue = $(`td[data-subtable="${subTableIndex}"][data-row="${rowIndex}"][data-collumn="${cellIndex}"]`).find('input').val();
             boardString += inputedValue;
             
             cellIndex++;

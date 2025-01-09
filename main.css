@@ -93,7 +93,7 @@
     margin: 0;
 }
 
-#messageBox {
+#messageBox, #missingCellsMessageBox, #incorrectBoardMessageBox, #correctBoardMessageBox, #correctAutoFilledBoardMessageBox {
     display: none;
     position: fixed;
     z-index: 1;

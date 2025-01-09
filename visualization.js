@@ -123,6 +123,14 @@ export const removeBoardNotations = () => {
     $(".sudokuBoard *").removeClass("cellWarning");
     $(".sudokuBoard *").removeClass("cellMistake");
     $(".sudokuBoard *").removeClass("cellMissingValue");
+
+    $(".sudokuBoard *").removeClass("rowWarning");
+    $(".sudokuBoard *").removeClass("subtableWarning");
+    $(".sudokuBoard *").removeClass("collumnWarning");
+
+    $(".sudokuBoard *").removeClass("rowMistake");
+    $(".sudokuBoard *").removeClass("subtableMistake");
+    $(".sudokuBoard *").removeClass("collumnMistake");
 }
 
 export const displayMessageBox = () => {
@@ -131,24 +139,9 @@ export const displayMessageBox = () => {
 }
 
 export const disableMessageBox = () => {
-    $('#messageBox').hide();
+    $('#missingCellsMessageBox').hide();
+    $('#incorrectBoardMessageBox').hide();
+    $('#correctBoardMessageBox').hide();
+    $('#correctAutoFilledBoardMessageBox').hide();
     $('.overlay').hide();
-    $('#messageBoxContent').empty();
 }
-
-window.applyBulletHole = applyBulletHole;
-window.applyExplosion = applyExplosion;
-
-window.doHelicopterPass = doHelicopterPass;
-
-window.visualiseRow = visualiseRow;
-
-window.visualiseCollumn = visualiseCollumn;
-
-window.visualiseSubtable = visualiseSubtable;
-
-window.removeBoardNotations = removeBoardNotations;
-
-window.displayMessageBox = displayMessageBox;
-
-window.disableMessageBox = disableMessageBox;

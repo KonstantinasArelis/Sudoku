@@ -15,9 +15,39 @@
         <h1>Sudoku</h1>
     </div>
     
-    <div id="messageBox">
+    <div id="missingCellsMessageBox">
         <div id="messageBoxContent">
+            <p class="simpleText"> You have to fill out all free cells in sudoku </p>
+            <button class="simpleButton simpleText okButton"> Ok </button>
+            <button class="simpleButton simpleText restartButton"> Restart </button>
+            <button class="simpleButton simpleText showAnswerButton"> Show Answer </button>
+        </div>
+    </div>
 
+    <div id="incorrectBoardMessageBox">
+        <div id="messageBoxContent">
+            <p class="simpleText"> The board is incorrect </p>
+            <button class="simpleButton simpleText okButton"> Ok </button>
+            <button class="simpleButton simpleText restartButton"> Restart </button>
+            <button class="simpleButton simpleText showAnswerButton"> Show Answer </button>
+        </div>
+    </div>
+
+    <div id="correctBoardMessageBox">
+        <div id="messageBoxContent">
+            <p class="simpleText"> You won! Good job! </p>
+            <button class="simpleButton simpleText okButton"> Ok </button>
+            <button class="simpleButton simpleText restartButton"> Restart </button>
+            <button class="simpleButton simpleText showAnswerButton"> Show Answer </button>
+        </div>
+    </div>
+
+    <div id="correctAutoFilledBoardMessageBox">
+        <div id="messageBoxContent">
+            <p class="simpleText"> You auto-filled the board, better luck next time! </p>
+            <button class="simpleButton simpleText okButton"> Ok </button>
+            <button class="simpleButton simpleText restartButton"> Restart </button>
+            <button class="simpleButton simpleText showAnswerButton"> Show Answer </button>
         </div>
     </div>
 

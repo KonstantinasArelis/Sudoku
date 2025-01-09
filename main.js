@@ -1,5 +1,5 @@
 import {visualiseRow, visualiseCollumn, visualiseSubtable,
-        removeBoardNotations, displayMessageBox, disableMessageBox,} from './visualization.js';
+        removeBoardNotations, displayMessageBox, disableMessageBox} from './visualization.js';
 
 import {validateSubtable, validateCollumn, validateRow} from './validation.js';
 
@@ -19,7 +19,27 @@ $(document).ready( function() {
     });
 
     $(document).on('click', '.submitButton', function(e) {
+        $('.overlay').show();
         submitBoard();
+    })
+
+    $(document).on('click', '.okButton', function(e) {
+        $('.overlay').hide();
+        disableMessageBox();
+    })
+
+    $(document).on('click', '.restartButton', function(e) {
+        $('.overlay').hide();
+        disableMessageBox();
+
+        restartSudoku();
+    })
+
+    $(document).on('click', '.showAnswerButton', function(e) {
+        $('.overlay').hide();
+        disableMessageBox();
+        
+        revealAnswer();
     })
 });
 
@@ -170,44 +190,20 @@ const boardCompletionCheck = () => {
 }
 
 const submitBoard = () => {
-    let completedSuccefully = true;
-
     if(!boardCompletionCheck()){
-        completedSuccefully = false;
-        displayMessageBox();
-        let text = '<p class="simpleText"> You have to fill out all free cells in sudoku';
-        
-        $('#messageBoxContent').append(text);
+        $('#missingCellsMessageBox').show();
     } else if(getCurrentBoardString() !== boardSolution){
-        completedSuccefully = false;
-        displayMessageBox();
-        let text = '<p class="simpleText"> The board is incorrect';
-        
-        $('#messageBoxContent').append(text);
-    }
-    if(completedSuccefully === false){
-        let oKbutton = '<button onClick="disableMessageBox()" class="simpleButton simpleText"> Ok';
-        $('#messageBoxContent').append(oKbutton);
-        let restartButton = '<button onClick="disableMessageBox(); restartSudoku()" class="simpleButton simpleText"> Restart';
-        $('#messageBoxContent').append(restartButton);
-        let revealAnswerButton = '<button onClick="disableMessageBox(); revealAnswer()" class="simpleButton simpleText"> Show Answer';
-        $('#messageBoxContent').append(revealAnswerButton);
-        displayMessageBox();
+        $('#incorrectBoardMessageBox').show();
     } else {
         if(boardWasFilled === false){
-            let text = '<p class="simpleText"> You won! Good job!';
-        $('#messageBoxContent').append(text);
+            $('#correctBoardMessageBox').show();
         } else {
-            let text = '<p class="simpleText"> You auto-filled the board, better luck next time!';
-        $('#messageBoxContent').append(text);
+            $('#correctAutoFilledBoardMessageBox').show();
         }
-        let restartButton = '<button onClick="disableMessageBox(); restartSudoku()" class="simpleButton simpleText"> Restart';
-        $('#messageBoxContent').append(restartButton);
-        displayMessageBox();
     }
 }
 
-const restartSudoku = () => {
+export const restartSudoku = () => {
     // delete everything inside each of the cells
     $("[data-subtable]").empty();
     // re-populate the board
