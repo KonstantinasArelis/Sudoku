@@ -187,8 +187,13 @@
     }
 }
 
-@keyframes explosion {
-
+@keyframes planePass {
+    0% {
+        transform: translateX(0) translateY(0) rotate(0deg)
+    }
+    100% {
+        transform: translateX(-80%) translateY(-400%) rotate(15deg);
+    }
 }
 
 @keyframes fadeOut {

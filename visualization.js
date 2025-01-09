@@ -13,7 +13,7 @@ export const applyBulletHole = (element, delay) => {
             height: 20px;
             animation: fadeOut ${duration}s linear 1;
         `;
-        let bulletHole = `<img src = "./bulletImpact.png" style="${styling}" class="bulletHole">`
+        let bulletHole = `<img src = "./images/bulletImpact.png" style="${styling}" class="bulletHole">`
         let bulletHoleInstance = $(bulletHole).appendTo('body');
 
         setTimeout(() => {
@@ -35,11 +35,36 @@ export const applyExplosion = (element, delay) => {
             width: 100px;
             height: 100px;
         `;
-        let bulletHole = `<img src = "./explosion.gif" style="${styling}">`
+        let bulletHole = `<img src = "./images/explosion.gif" style="${styling}">`
         let bulletHoleInstance = $(bulletHole).appendTo('body');
         setTimeout(() => {
             $(bulletHoleInstance).remove();
         }, 350);
+    }, delay);
+}
+
+export const applySpark = (element, delay) => {
+    setTimeout(() => {
+        const duration = (Math.random()+1) * 2;
+        const position = $(element).offset();
+        const offsetX = Math.random() * $(element).width() + position.left;
+        const offsetY = Math.random() * $(element).height() + position.top;
+        const degreeVariation = Math.random() * 360;
+        let styling = `
+            position: absolute;
+            left: ${offsetX}px;
+            top: ${offsetY}px;
+            transform: rotate(${degreeVariation}deg);
+            width: 80px;
+            height: 80px;
+
+        `;
+        let spark = `<img src = "./images/spark.gif" style="${styling}" class="spark">`
+        let sparkInstance = $(spark).appendTo('body');
+
+        setTimeout(() => {
+            $(sparkInstance).remove();
+        }, duration * 200);
     }, delay);
 }
 
@@ -54,10 +79,27 @@ export const doHelicopterPass = () => {
             width: 60%;
         `;
 
-    const helicopter = `<img src="./helicopter.gif" style="${styling}">`;
+    const helicopter = `<img src="./images/helicopter.gif" style="${styling}">`;
     const helicopterInstance = $(helicopter).appendTo('body');
     setTimeout(() => {
         helicopterInstance.remove();   
+    }, 1500);
+}
+
+export const doPlanePass = () => {
+    const horizontalPosition = (Math.random()) * 80;
+    
+    let styling = `
+        position: fixed;
+        top: 100%;
+        right: ${horizontalPosition}%;
+        animation: planePass 1.5s linear 1;
+    `;
+
+    const plane = `<img src="./images/plane.gif" style="${styling}">`;
+    const planeInstance = $(plane).appendTo('body');
+    setTimeout(() => {
+        planeInstance.remove();
     }, 1500);
 }
 
@@ -89,7 +131,18 @@ export const visualiseRow = (mistakes, row) => {
 
 export const visualiseCollumn = (mistakes, collumn) => {
     if(mistakes.length !== 0){
-        for(const cell of collumn){
+        const sequentialCollumn = sortByRowDescending(collumn);
+        // delay to make the visuals sequential
+        let delay = 0;
+        doPlanePass();
+
+        for(const cell of sequentialCollumn){
+            
+            for(let i=0;i<20;i++){
+                applySpark(cell, delay);
+                delay+= (Math.random() + 1) * 5;
+            }
+            
             $(cell).addClass('collumnWarning');
         }
         for (const cell of mistakes){
@@ -145,3 +198,17 @@ export const disableMessageBox = () => {
     $('#correctAutoFilledBoardMessageBox').hide();
     $('.overlay').hide();
 }
+
+function sortByRowDescending(column) {
+    const sortedColumn = [];
+  
+    for (const cell of column) {
+      const row = cell.data('row') + cell.data('subtable');
+      sortedColumn[row] = cell;
+    }
+  
+    sortedColumn.reverse();
+  
+    return sortedColumn;
+  }
+  
